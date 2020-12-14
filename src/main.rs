@@ -46,67 +46,100 @@ fn lexer(program: String) {
         if line == "" { continue }
         let mut word = String::new();
         let mut string_started = false;
+        let mut goes_into = false;
+        let mut gets_from = false;
         let mut iterator = line.chars().peekable();
         while let Some(char) = iterator.next() {
         // for char in line.chars() {
             if char.is_alphanumeric() {
                 word.push(char);
             }
-            else {
-                if !word.is_empty() {
-                    println!("{:?}", word);
-                    word.clear();
+            else if !word.is_empty() {
+                println!("{:?}", word);
+                word.clear();
+            }
+            if char == '"' {
+                let mut string_started = !string_started;
+            }
+            if char == '=' {
+                println!("EQUALS");
+            }
+            else if char == '/' && !char.is_alphanumeric() {
+                let peek = *iterator.peek().expect("Program failed. Can't tell what '/' refers to.");
+                if peek == '/' {
+                    break;
                 }
-                if char == '"' {
-                    if string_started {
-                        string_started = false;
-                    }
-                    else {
-                        string_started = true;
-                    }
+                else {
+                    println!("DIVIDE");
                 }
-                if char == '=' {
-                    println!("EQUALS");
+            }
+            else if char == '>' {
+                println!("GREATERTHAN");
+            }
+            else if char == '<' {
+                let peek = *iterator.peek().expect("Program failed. Can't tell what '<' refers to.");
+                if peek == '(' || peek == '-' {
+                    println!("GETSFROM");
+                    gets_from = true;
+                    iterator.next();
                 }
-                else if char == '/' {
-                    let peek = match iterator.peek() {
-                        Some(string) => string,
-                        None => panic!("Program failed. Can't tell what '/' refers to.")
-                    };
-                    let peek = *peek;
-                    if peek == '/' {
-                        break;
-                    }
-                }
-                else if char == '>' {
-                    println!("GREATERTHAN");
-                }
-                else if char == '<' {
+                else {
                     println!("LESSTHAN");
                 }
-                else if char == ':' {
-                    let peek = *iterator.peek().unwrap();
-                    if peek == ':' {
-                        println!("BLOCK");
-                        break;
-                    }
+            }
+            else if char == ':' {
+                let peek = *iterator.peek().expect("Program failed. Can't tell what ':' refers to.");
+                if peek == ':' {
+                    println!("BLOCK");
+                    break;
                 }
-                else if char == ',' {
-                    println!("COMMA");
+            }
+            else if char == ',' {
+                println!("COMMA");
+            }
+            else if char == '[' {
+                println!("LSQUAREBRACKET");
+            }
+            else if char == ']' {
+                println!("RSQUAREBRACKET");
+            }
+            else if char == '(' {
+                println!("LBRACKET");
+            }
+            else if char == ')' {
+                let peek = *iterator.peek().unwrap_or(&' ');
+                if peek == '>' && goes_into {
+                    println!("GOESINTO");
+                    goes_into = false;
+                    iterator.next();
                 }
-                else if char == '[' {
-                    println!("LSQUAREBRACKET");
+                else if peek == '-' && gets_from {
+                    println!("GETSFROM");
+                    gets_from = false;
+                    iterator.next();
                 }
-                else if char == ']' {
-                    println!("RSQUAREBRACKET");
-                }
-                else if char == '(' {
-                    println!("LBRACKET");
-                }
-                else if char == ')' {
+                else {
                     println!("RBRACKET");
                 }
-                else if char == '-' {
+            }
+            else if char == '-' {
+                let peek = *iterator.peek().expect("Program failed. Can't tell what '-' refers to.");
+                if peek == '>' {
+                    println!("GOESINTO");
+                    iterator.next();
+                }
+                else if peek == '(' {
+                    iterator.next();
+                    let peek = *iterator.peek().expect("Program failed. Can't tell what '(' refers to.");
+                    if peek.is_alphabetic() {
+                        println!("GOESINTO");
+                        goes_into = true;
+                    }
+                    else {
+                        println!("MINUS");
+                    }
+                }
+                else {
                     println!("MINUS");
                 }
             }

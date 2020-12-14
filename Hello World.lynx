@@ -10,6 +10,12 @@ predict = [12, 7]
 
 output <(model)- predict
 
+// Implement anonymous functions here too where model is inferred eg.
+// output <- answer
+// or
+// item -> answer
+
+
 show output
 
 // This is a test file
