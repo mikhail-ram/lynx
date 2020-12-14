@@ -1,0 +1,15 @@
+X = [[10, 20], [30, 40]]
+y = [24, 2]
+
+for item, answer in X, y
+::
+    item -(model)> answer
+::
+
+predict = [12, 7]
+
+output <(model)- predict
+
+show output
+
+// This is a test file
