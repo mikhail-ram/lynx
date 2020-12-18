@@ -1,0 +1,14 @@
+program ::= {statement}
+statement ::= "show" ? (expression | string) NEWLINE
+| "if" comparison "do" "::" {statement} "::" NEWLINE
+| "while" comparison "do" "::" {statement} "::" NEWLINE
+| ident "()" "::" NEWLINE
+| ident "()" NEWLINE
+| ident "=" expression NEWLINE
+| "ask" string NEWLINE
+comparison ::= expression(("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
+expression ::= term {( "-" | "+") term}
+term ::= unary {("/" | "*") unary}
+unary ::= ["+" | "="] primary
+primary ::= number | ident
+NEWLINE ::= '\n'+
