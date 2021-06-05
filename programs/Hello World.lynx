@@ -1,2 +1,4 @@
-show "Hello, World!" // Test comment
-show "Hello, Lynx!"
+show "Hello World" // Test comment
+show "show me a sign" sdlf
+sdlf
+show "Hello Lynx"

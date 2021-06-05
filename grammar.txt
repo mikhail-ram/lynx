@@ -1,3 +1,6 @@
+The definitive grammar to the Lynx programming language
+
+
 program ::= {statement}
 statement ::= "show" ? (expression | string) NEWLINE
 | "if" comparison "do" "::" {statement} "::" NEWLINE
@@ -12,3 +15,108 @@ term ::= unary {("/" | "*") unary}
 unary ::= ["+" | "="] primary
 primary ::= number | ident
 NEWLINE ::= '\n'+
+
+[Revised Grammar]
+
+PROGRAM ::= {STATEMENT}
+STATEMENT ::= [ show ] EXPRESSION | STRING NEWLINE
+| ask STRING
+| read STRING as ITERABLE
+| if COMPARISON do :: STATEMENT :: {[else ::] STATEMENT :: } 
+| while COMPARISON do :: STATEMENT :: 
+| for ident in EXPRESSION do :: STATEMENT :: 
+| ident"("ident{, ident}")" [STRING] :: STATEMENT [RETURN] ::
+| ident"("ident{, ident}")
+| ident = EXPRESSION | ITERABLE
+| ITERABLE <"(" EXPRESSION | ident ")"- ITERABLE
+| ITERABLE <- ITERABLE
+COMPARISON ::= EXPRESSION {( == | != | > | >= | < | <= ) EXPRESSION}
+EXPRESSION ::= TERM {( - | + ) TERM}
+TERM ::= UNARY {( / | * ) UNARY}
+UNARY ::= ( = | + ) PRIMARY
+PRIMARY ::= number | ident
+RETURN ::= "("ident")"
+STRING ::= '"'ident'"'
+ITERABLE ::= "["number{, number}"]" | "["ITERABLE{, ITERABLE}"]"
+
+[Example Program]
+
+fibonacci(until)
+::
+    previous = -1
+    result = 1
+    for number in until do
+    ::
+        sum = result + previous
+        previous = result
+        result = sum
+    ::
+
+    result // implicit return like in Rust
+
+    // or for more explicit return
+    (result) // I've decided that a 'return' keyword is honestly redundant
+
+::
+
+final = fibonacci(until)
+
+
+read_file(filename)
+"Displays the Fibonacci sequence"
+::
+    show line <(x.remove_whitespace())- filename
+::
+
+weights = [10, 25, 35, 70]
+heights = [120, 170, 150, 160]
+
+new_heights <(height/100)- heights
+bmi = weights / (heights / 100)^2 // See how scalar operations take place on entire array like in NumPy
+// or
+bmi = weights / new_heights <(height^2)- _ <(height/100)- heights // Functions and anonymous functions can be chained
+
+// to print all items in list (or perform other operations in place
+<(show height)- heights
+
+// or
+_ <(show height)- heights // BTW, 'height' can be any variable you name, defined by the iterator. The item being iterated over must be 'iterable'.
+
+// or if you need to do multiple lines of things
+<(
+    show height
+    // or whatever
+ )- heights
+
+// or
+
+show_height(height)
+::
+    show height
+::
+
+<(show_height(height))- heights
+
+// NOTE: language defined core functions do not require brackets but others do (like in other languages)
+
+
+// Say you want to cluster something
+X = [[10, 120], [25, 170], [35, 150], [70, 160]]
+
+// Reading from csv
+read 'train.csv' as X // Simple!
+
+labeled_X <- X // Note how the mapping is a definitive one to one mapping, as we can't infer if the programmer wants the cluster labels or the labeled data from cluster.
+
+// Or, you can do more things with named models
+
+labels <(clusterer)- X
+
+show clusterer.labels
+
+// And most other OOP features
+// Side note: just used :: as block delimiters for fun, looks cool imo
+// This would make a great language for machine learning
+// Writing it in Rust so its a high-level language which is still extremely fast
+// Also easy to develop in like Python (rapid development)
+// Seems pretty fun!
